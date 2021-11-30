@@ -1,6 +1,7 @@
 import frappe
 from frappe import _
 from wiki.wiki.doctype.wiki_page.wiki_page import get_open_contributions
+from wiki.wiki.doctype.wiki_page.wiki_page import get_open_drafts
 
 
 def get_context(context):
@@ -40,6 +41,10 @@ def get_context(context):
 				{
 					"label": _("Contributions ") + get_open_contributions(),
 					"url": "/contributions",
+				},
+				{
+					"label": _("My Drafts ") + get_open_drafts(),
+					"url": "/drafts",
 				},
 			]
 		}
