@@ -23,7 +23,36 @@ This builds both:
 - public page CSS at `wiki/public/css/tailwind.css`
 - the `/wiki` Vue app at `wiki/public/frontend` and `wiki/www/wiki.html`
 
-## 3. Publish the initial wiki content
+## 3. Check the Wiki search index owner
+
+Wiki uses Frappe's SQLite search index at `sites/<site-name>/wiki_search.db`.
+The index uses SQLite WAL files, so the main database and its `-wal` / `-shm`
+files must be writable by the same OS user that runs the bench web and worker
+processes.
+
+If the index was built or migrated as a different user, merges or document
+updates can fail with:
+
+```text
+sqlite3.OperationalError: attempt to write a readonly database
+```
+
+Build or fix the index as the bench user:
+
+```bash
+bench --site <site-name> build-search-index
+sudo chown <bench-user>:<bench-group> sites/<site-name>/wiki_search.db*
+bench restart
+```
+
+For example, on a bench running as `frappe` with group `frappedev`:
+
+```bash
+sudo chown frappe:frappedev sites/<site-name>/wiki_search.db*
+bench restart
+```
+
+## 4. Publish the initial wiki content
 
 The installer creates a default Wiki Space with route `docs` and a welcome page.
 Before opening it publicly, confirm:
@@ -42,7 +71,7 @@ Permission Level: Read
 Without this row, anonymous users will get a 404 even if the space and page are
 published.
 
-## 4. Clear caches and restart
+## 5. Clear caches and restart
 
 ```bash
 bench --site <site-name> clear-cache
@@ -50,7 +79,7 @@ bench --site <site-name> clear-website-cache
 bench restart
 ```
 
-## 5. Verify
+## 6. Verify
 
 ```bash
 curl -I -L https://<site-name>/wiki
