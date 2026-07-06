@@ -186,3 +186,5 @@ default_log_clearing_doctypes = {
 website_route_rules = [
 	{"from_route": "/wiki/<path:app_path>", "to_route": "wiki"},
 ]
+
+after_request = ["wiki.www.wiki.set_robots_header"]
