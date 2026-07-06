@@ -24,7 +24,7 @@ Builder additionally exposes a manual per-image "Convert to WebP" / "Serve Local
 - All editor image uploads funnel through one function: `frontend/src/components/WikiEditor.vue::uploadFile(file)` (paste `handlePaste`, drag-drop `handleDrop`, toolbar `handleImageUpload`, slash-command `handleSlashImageSelect`). It calls frappe-ui's `useFileUpload().upload(file, { private: false })` and returns `result.file_url`, which is handed to `setImage({ src: url })`.
 - frappe-ui's `UploadOptions` supports both `upload_endpoint` (the URL the multipart POST is sent to) and `method` (a form field passed to `/api/method/upload_file` telling it to *delegate* to another whitelisted method). **These are not interchangeable** — see Design §4 and Verification: `method` causes a delegation loop here, so we use `upload_endpoint`.
 - Backend whitelisted APIs live in `wiki/api/__init__.py` (app module `wiki`, so the method path is `wiki.api.<fn>`). Settings live in the `Wiki Settings` single doctype (`wiki/wiki/doctype/wiki_settings`).
-- Python `>=3.14`. Pillow is not a *declared* dependency but is already present in the bench env (12.1.1, a frappe transitive dep). We declare it explicitly anyway.
+- Python `>=3.10`. Pillow is not a *declared* dependency but is already present in the bench env (12.1.1, a frappe transitive dep). We declare it explicitly anyway.
 - The image node stores only `src`; no per-image "original format" metadata is kept.
 
 ## Non-Goals
