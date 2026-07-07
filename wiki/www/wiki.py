@@ -10,8 +10,12 @@ sitemap = 0
 ROBOTS_DIRECTIVE = "noindex, nofollow"
 
 
+def set_robots_header(response, request):
+	if request.path == "/wiki" or request.path.startswith("/wiki/"):
+		response.headers["X-Robots-Tag"] = ROBOTS_DIRECTIVE
+
+
 def get_context():
-	frappe.local.response_headers.set("X-Robots-Tag", ROBOTS_DIRECTIVE)
 	csrf_token = frappe.sessions.get_csrf_token()
 	frappe.db.commit()  # nosemgrep
 	context = frappe._dict()
