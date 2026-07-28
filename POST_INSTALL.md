@@ -21,7 +21,7 @@ yarn build
 This builds both:
 
 - public page CSS at `wiki/public/css/tailwind.css`
-- the `/wiki` Vue app at `wiki/public/frontend` and `wiki/www/wiki.html`
+- the `/wiki-app` Vue app at `wiki/public/frontend` and `wiki/www/wiki-app.html`
 
 ## 3. Check the Wiki search index owner
 
@@ -82,13 +82,13 @@ bench restart
 ## 6. Verify
 
 ```bash
-curl -I -L https://<site-name>/wiki
+curl -I -L https://<site-name>/wiki-app
 curl -I -L https://<site-name>/docs
 curl -I https://<site-name>/assets/wiki/frontend/index.html
 ```
 
 Expected results:
 
-- `/wiki` returns `200 OK` for the Wiki admin SPA
+- `/wiki-app` returns `200 OK` for the Wiki admin SPA
 - `/docs` redirects to the first published page and returns `200 OK`
 - `/assets/wiki/frontend/index.html` returns `200 OK`

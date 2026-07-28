@@ -11,7 +11,7 @@ ROBOTS_DIRECTIVE = "noindex, nofollow"
 
 
 def set_robots_header(response, request):
-	if request.path == "/wiki" or request.path.startswith("/wiki/"):
+	if request.path == "/wiki-app" or request.path.startswith("/wiki-app/"):
 		response.headers["X-Robots-Tag"] = ROBOTS_DIRECTIVE
 
 

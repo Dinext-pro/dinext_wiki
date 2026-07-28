@@ -204,4 +204,4 @@ website_route_rules = [
 	{"from_route": "/wiki-app/<path:app_path>", "to_route": "wiki-app"},
 ]
 
-after_request = ["wiki.www.wiki.set_robots_header"]
+after_request = ["wiki.www.wiki_app.set_robots_header"]
