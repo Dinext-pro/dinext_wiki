@@ -22,8 +22,13 @@ import re
 import frappe
 from frappe import _
 from frappe.rate_limiter import rate_limit
-from frappe.utils.preview import get_preview_from_html
 from werkzeug.wrappers import Response
+
+# frappe.utils.preview landed in Frappe v16; Dinext runs Wiki on v15.
+try:
+	from frappe.utils.preview import get_preview_from_html
+except ImportError:  # pragma: no cover - exercised on Frappe < v16
+	get_preview_from_html = None
 
 # Bumped whenever the card template or its token block changes; it is part of
 # the cache fingerprint, so a bump invalidates every cached card for free.
@@ -262,6 +267,11 @@ def render_og_html(ctx: dict) -> str:
 
 
 def generate_og_bytes(ctx: dict) -> bytes:
+	if get_preview_from_html is None:
+		frappe.throw(
+			_("OG image generation requires Frappe with frappe.utils.preview (v16+)"),
+			frappe.ValidationError,
+		)
 	return get_preview_from_html(render_og_html(ctx), format="jpg", width=OG_WIDTH, height=OG_HEIGHT)
 
 
