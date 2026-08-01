@@ -37,11 +37,13 @@ export default defineConfig(async ({ command, mode }) => {
 					source: '^/(app|login|api|assets|files|private|razorpay_checkout)',
 				},
 				jinjaBootData: true,
+				// Required by frappe-ui components (e.g. Rating.vue → ~icons/lucide/*).
 				lucideIcons: true,
 				buildConfig: {
 					indexHtmlPath: '../wiki/www/wiki-app.html',
 					emptyOutDir: true,
-					sourcemap: true,
+					// Production sourcemaps roughly double Rollup peak memory.
+					sourcemap: false,
 				},
 			}),
 			vue(),
@@ -51,7 +53,7 @@ export default defineConfig(async ({ command, mode }) => {
 			outDir: '../wiki/public/frontend',
 			emptyOutDir: true,
 			target: 'es2015',
-			sourcemap: true,
+			sourcemap: false,
 		},
 		resolve: {
 			alias: {
