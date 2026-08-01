@@ -1,0 +1,8 @@
+# Minimal CI so GitLab "Pipelines must succeed" can pass.
+# This fork has no project-specific CI yet; GitHub Actions stay unused here.
+stages: [check]
+
+noop:
+  stage: check
+  script:
+    - echo "dinext_wiki CI placeholder OK"
