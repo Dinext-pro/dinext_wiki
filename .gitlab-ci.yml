@@ -4,5 +4,6 @@ stages: [check]
 
 noop:
   stage: check
+  tags: [dinext, validation, docker]
   script:
     - echo "dinext_wiki CI placeholder OK"
