@@ -4,6 +4,9 @@
 import frappe
 from frappe.utils import get_system_timezone
 
+from wiki.telemetry import capture, default_properties
+from wiki.utils import get_asset_hash
+
 no_cache = 1
 sitemap = 0
 
@@ -17,6 +20,8 @@ def get_context():
 	context = frappe._dict()
 	context.boot = get_boot()
 	context.boot.csrf_token = csrf_token
+	if frappe.session.user != "Guest":
+		capture("active_site", interval="1d")
 	return context
 
 
@@ -34,5 +39,18 @@ def get_boot():
 			"site_name": frappe.local.site,
 			"read_only_mode": frappe.flags.read_only,
 			"system_timezone": get_system_timezone(),
+			"asset_hashes": get_asset_hashes(),
+			"telemetry": default_properties(),
 		}
 	)
+
+
+def get_asset_hashes() -> dict:
+	"""Content hashes for the app assets the SPA pulls in at runtime.
+
+	Those are served with far-future `immutable` caching, so a bare URL pins
+	whichever copy the browser fetched first — a stale one keeps failing long
+	after the fix ships. The SPA appends these hashes so a changed file is
+	always a new URL.
+	"""
+	return {"mermaid_loader": get_asset_hash("public/js/mermaid-loader.js")}
