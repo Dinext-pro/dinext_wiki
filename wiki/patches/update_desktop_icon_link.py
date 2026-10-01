@@ -4,9 +4,8 @@ import frappe
 
 
 def execute():
-	frappe.db.set_value(
-		"Desktop Icon",
-		{"app": "wiki", "icon_type": "App", "link": "/wiki"},
-		"link",
-		"/wiki-app",
-	)
+	filters = {"app": "wiki", "link": "/wiki"}
+	# icon_type exists on Frappe v16 Desktop Icon only.
+	if frappe.db.has_column("Desktop Icon", "icon_type"):
+		filters["icon_type"] = "App"
+	frappe.db.set_value("Desktop Icon", filters, "link", "/wiki-app")
