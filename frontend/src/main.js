@@ -1,4 +1,4 @@
-import { telemetryPlugin } from '@framework/ui/telemetry/index.ts';
+import { telemetryPlugin } from '@/lib/framework-telemetry/telemetry';
 import { createApp, watchEffect } from 'vue';
 
 import App from './App.vue';

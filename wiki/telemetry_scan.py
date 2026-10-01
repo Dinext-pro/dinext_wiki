@@ -14,7 +14,16 @@ from bisect import bisect_right
 
 import frappe
 from frappe.utils import add_days, date_diff, now_datetime
-from frappe.utils.telemetry import is_pulse_enabled, site_age
+
+try:
+	from frappe.utils.telemetry import is_pulse_enabled, site_age
+except ImportError:  # pragma: no cover - Frappe < v16 has no Pulse helper
+
+	def is_pulse_enabled() -> bool:
+		return False
+
+	def site_age():
+		return None
 
 from wiki import analytics_store
 from wiki.api.og_image import cached_card_count
