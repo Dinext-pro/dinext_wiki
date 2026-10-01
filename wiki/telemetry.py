@@ -4,10 +4,17 @@ puts on all of them."""
 from contextlib import suppress
 
 import frappe
-from frappe.utils import telemetry as frappe_telemetry
 from frappe.utils.caching import site_cache
 
 import wiki
+
+# frappe.utils.telemetry landed in Frappe v16. Dinext runs Wiki on v15, so
+# capture is a no-op until Pulse exists. Import must not fail: callers import
+# this module at load time (wiki_app, document save, the daily scheduler).
+try:
+	from frappe.utils import telemetry as frappe_telemetry
+except ImportError:  # pragma: no cover - exercised on Frappe < v16
+	frappe_telemetry = None
 
 
 def default_properties() -> dict:
@@ -16,6 +23,8 @@ def default_properties() -> dict:
 
 def capture(event: str, interval: str | None = None, **props):
 	"""Send one event. Telemetry never fails the action it reports on."""
+	if frappe_telemetry is None:
+		return
 	with suppress(Exception):
 		frappe_telemetry.capture(
 			event,
