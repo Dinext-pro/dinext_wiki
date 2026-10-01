@@ -3,13 +3,17 @@ import { createRouter, createWebHistory } from 'vue-router';
 const routes = [
 	{
 		path: '/',
-		name: 'Home',
-		redirect: '/spaces',
+		name: 'Overview',
+		component: () => import('@/pages/Overview.vue'),
+	},
+	{
+		path: '/overview',
+		redirect: { name: 'Overview' },
 	},
 	{
 		path: '/spaces',
-		name: 'SpaceList',
-		component: () => import('@/pages/Spaces.vue'),
+		name: 'AllSpaces',
+		component: () => import('@/pages/AllSpaces.vue'),
 	},
 	{
 		path: '/change-requests',
@@ -95,6 +99,8 @@ router.beforeEach(async (to, from, next) => {
 		window.location.href = `/login?redirect-to=/wiki-app${encodeURIComponent(
 			to.fullPath,
 		)}`;
+	} else if (to.name === 'Overview' && !userStore.isWikiManager) {
+		next({ name: 'AllSpaces', replace: true });
 	} else {
 		next();
 	}
