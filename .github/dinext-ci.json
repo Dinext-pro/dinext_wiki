@@ -1,0 +1,8 @@
+{
+  "app": "wiki",
+  "package_dir": "wiki",
+  "mode": "repository",
+  "gitflow": false,
+  "frontend_tests": false,
+  "skip_test_records": false
+}
