@@ -1,11 +1,12 @@
-"""Point the Wiki desktop icon at /wiki-app on sites still holding the pre-rename /wiki link."""
+"""Point an existing Wiki desktop icon at /wiki-app across supported Frappe versions."""
 
 import frappe
 
 
 def execute():
+	if not frappe.db.exists("DocType", "Desktop Icon"):
+		return
 	filters = {"app": "wiki", "link": "/wiki"}
-	# icon_type exists on Frappe v16 Desktop Icon only.
 	if frappe.db.has_column("Desktop Icon", "icon_type"):
 		filters["icon_type"] = "App"
 	frappe.db.set_value("Desktop Icon", filters, "link", "/wiki-app")
