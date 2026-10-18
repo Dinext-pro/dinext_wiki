@@ -3,22 +3,27 @@ puts on all of them."""
 
 from contextlib import suppress
 
-import frappe
-from frappe.utils.caching import site_cache
+try:
+	from frappe.utils import telemetry as frappe_telemetry
+except ImportError:  # Frappe 15 does not provide Pulse.
+	frappe_telemetry = None
 
 import wiki
 
-# frappe.utils.telemetry landed in Frappe v16. Dinext runs Wiki on v15, so
-# capture is a no-op until Pulse exists. Import must not fail: callers import
-# this module at load time (wiki_app, document save, the daily scheduler).
-try:
-	from frappe.utils import telemetry as frappe_telemetry
-except ImportError:  # pragma: no cover - exercised on Frappe < v16
-	frappe_telemetry = None
-
 
 def default_properties() -> dict:
-	return {"app_version": wiki.__version__, "entry": get_entry()}
+	return {"app_version": wiki.__version__}
+
+
+def reader_config() -> dict:
+	"""Pulse client config for the reader, which has no SPA boot to carry it."""
+	with suppress(Exception):
+		from frappe.utils.telemetry.pulse.client import boot_config
+
+		config = boot_config()
+		if config.get("enabled"):
+			return {**config, **default_properties()}
+	return {"enabled": False}
 
 
 def capture(event: str, interval: str | None = None, **props):
@@ -32,12 +37,6 @@ def capture(event: str, interval: str | None = None, **props):
 			properties={**default_properties(), **props},
 			interval=interval,
 		)
-
-
-@site_cache(ttl=24 * 60 * 60)
-def get_entry() -> str:
-	"""How the site came to run Wiki."""
-	return "saas_trial" if frappe.conf.get("fc_team") else "self_hosted"
 
 
 def error_kind(exception: BaseException) -> str:
