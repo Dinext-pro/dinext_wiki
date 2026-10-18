@@ -14,7 +14,13 @@ def load_file(path, frappe):
     spec = importlib.util.spec_from_file_location("dinext_compatibility_subject", ROOT / path)
     module = importlib.util.module_from_spec(spec)
     utils = ModuleType("frappe.utils")
-    with patch.dict(sys.modules, {"frappe": frappe, "frappe.utils": utils}):
+    utils.__path__ = []
+    with patch.dict(sys.modules, {
+        "frappe": frappe,
+        "frappe.utils": utils,
+        "frappe.utils.telemetry": None,
+        "frappe.utils.telemetry.pulse.client": None,
+    }):
         spec.loader.exec_module(module)
     return module
 

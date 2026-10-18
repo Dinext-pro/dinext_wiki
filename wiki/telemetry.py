@@ -5,7 +5,7 @@ from contextlib import suppress
 
 try:
 	from frappe.utils import telemetry as frappe_telemetry
-except ImportError:  # Frappe 15 does not provide Pulse.
+except ImportError:  # Older Frappe 15 releases may not provide this module.
 	frappe_telemetry = None
 
 import wiki

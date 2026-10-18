@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "upstream": "frappe/wiki",
+  "selected_tag": "v3.4.0",
+  "selected_commit": "c2b5daafcf391af6d909a466018feaea686ec448",
+  "integration_branch": "main/v15",
+  "prior_dinext_commit": "61d3a62738eb56369b8fef09857408d97def3bc3",
+  "prior_vendor_snapshot": "393fdcb7ca507b9ecc097c65be0bffb22304f99f",
+  "customizations": "docs/dinext-source-upgrade.md",
+  "automatic_sync": false
+}
