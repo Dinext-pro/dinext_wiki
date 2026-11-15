@@ -91,8 +91,8 @@ if [[ "$phase" == compatibility ]]; then
 else
   (cd sites && python -m frappe.utils.bench_helper frappe --site "$site" serve --port 8000 --noreload) > "$reports/web.log" 2>&1 & web_pid=$!
   trap 'kill "$web_pid" 2>/dev/null || true; tail -n 30 "$reports/web.log"' EXIT
-  curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 "http://$site:8000/api/method/ping"
-  export CYPRESS_BASE_URL="http://$site:8000"
+  curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 "http://127.0.0.1:8000/api/method/ping"
+  export CYPRESS_BASE_URL="http://127.0.0.1:8000"
   npx --yes --package=cypress@13.17.0 cypress run --project "apps/$app" --reporter junit --reporter-options "mochaFile=$reports/$app-browser-[hash].xml" --env "adminPassword=$admin_password"
 
 fi
