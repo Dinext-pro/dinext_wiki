@@ -89,7 +89,23 @@ if [[ "$phase" == compatibility ]]; then
   frappe_cli --site "$site" run-tests --app wiki --module wiki.test_permissions --junit-xml-output "$reports/test_permissions.xml"
   python -m unittest wiki.tests.test_dinext_v15_compatibility
 else
-  (cd sites && python -m frappe.utils.bench_helper frappe --site "$site" serve --port 8000 --noreload) > "$reports/web.log" 2>&1 & web_pid=$!
+  (cd sites && python - "$site" <<'PYTHON'
+import sys
+
+import frappe
+from frappe.desk.page.setup_wizard.setup_wizard import enable_setup_wizard_complete
+
+frappe.init(sys.argv[1])
+frappe.connect()
+for app_name in ("frappe", "erpnext"):
+    enable_setup_wizard_complete(app_name)
+frappe.db.set_single_value("System Settings", "setup_complete", 1)
+frappe.db.commit()
+frappe.clear_cache()
+frappe.destroy()
+PYTHON
+  )
+  (cd sites && DEV_SERVER=1 python -m frappe.utils.bench_helper frappe --site "$site" serve --port 8000 --noreload) > "$reports/web.log" 2>&1 & web_pid=$!
   trap 'kill "$web_pid" 2>/dev/null || true; tail -n 30 "$reports/web.log"' EXIT
   curl --fail --silent --show-error --retry 30 --retry-connrefused --retry-delay 2 "http://127.0.0.1:8000/api/method/ping"
   export CYPRESS_BASE_URL="http://127.0.0.1:8000"
