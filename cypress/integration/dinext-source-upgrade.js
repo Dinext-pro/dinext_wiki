@@ -6,7 +6,6 @@ describe('Wiki selected-release regression', () => {
     cy.loginUpgrade('Administrator', password)
     cy.callUpgrade('wiki.tests.dinext_upgrade.prepare').then((response) => {
       fixture = response.body.message
-      cy.loginUpgrade(fixture.user, fixture.password)
     })
   })
 
@@ -16,7 +15,8 @@ describe('Wiki selected-release regression', () => {
     cy.callUpgrade('wiki.tests.dinext_upgrade.cleanup')
   })
 
-  it('loads the upgraded application with its synthetic fixture', () => {
+  it('edits and reads the published document', () => {
+    cy.loginUpgrade(fixture.user, fixture.password)
     cy.visit('/wiki-app/spaces/' + encodeURIComponent(fixture.space))
     cy.contains(fixture.title).should('be.visible')
     cy.callUpgrade('frappe.client.set_value', {
@@ -25,5 +25,15 @@ describe('Wiki selected-release regression', () => {
     })
     cy.visit('/' + fixture.route.split('/').map(encodeURIComponent).join('/'))
     cy.contains('Verified upgraded Wiki content').should('be.visible')
+  })
+
+  it('keeps a restricted space inaccessible to an authenticated reader', () => {
+    const url = '/api/method/wiki.api.wiki_space.get_space_bootstrap'
+    const qs = { space_id: fixture.restricted }
+    cy.loginUpgrade(fixture.user, fixture.password)
+    cy.request({ url, qs }).its('body.message.doc.name').should('eq', fixture.restricted)
+    cy.clearCookies()
+    cy.loginUpgrade(fixture.reader, fixture.readerPassword)
+    cy.request({ url, qs, failOnStatusCode: false }).its('status').should('eq', 403)
   })
 })
