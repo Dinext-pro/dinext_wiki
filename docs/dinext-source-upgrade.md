@@ -1,18 +1,18 @@
 # Dinext source upgrade
 
-Selected upstream release: [v3.4.0](https://github.com/frappe/wiki/releases/tag/v3.4.0).
-Immutable upstream commit: `c2b5daafcf391af6d909a466018feaea686ec448`.
-Dinext integration line: `main/v15`.
+Selected upstream release: [v3.5.0](https://github.com/frappe/wiki/releases/tag/v3.5.0).
+Immutable upstream commit: `b7d605113248de5faa6f81640fa7a0951c5f8829`.
+Dinext integration line: `dinext/main/v15`.
 
 ## Preserved company changes
 
-Retain optional Pulse telemetry on Frappe 15, the robots response hook, production builds without sourcemaps, and compatible desktop-icon migration. Upstream 3.4.0 provides the Satori Open Graph fallback; it supersedes the old preview-only disable guard.
+The v15 line retains the optional Pulse helpers and frontend telemetry adapter, the robots response hook, the desktop icon migration guard, and production builds without sourcemaps. The upstream editor, reader, revision and space-permission changes ship with the release.
 
 ## Verification and activation
 
-Use the existing Dinext validation workflow and the tests/build commands declared by the application. Browser and migration checks must use an isolated Frappe 15 test site with synthetic data. Upstream publication workflows remain disabled.
+The Dinext acceptance workflow builds the candidate, migrates a disposable Frappe and ERPNext 15 site from the preceding fork revision, and runs the compatibility and browser suites. It reports the tested revision in the run summary. Test fixtures use synthetic records and require an enabled development test site and the System Manager role.
 
-This source update does not change a running site or deployment manifest. A runtime cutover requires verified backups, the exact accepted fork commit and matching release evidence. Keep the preceding source line available for rollback.
+Deployments use an independently verified release and manifest. Upstream publication workflows are archived under `.github/imported-workflows-disabled`.
 
 ## Verification record — 2026-10-18
 

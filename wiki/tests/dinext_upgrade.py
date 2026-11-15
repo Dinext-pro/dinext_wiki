@@ -5,6 +5,7 @@ from frappe.tests.ui_test_helpers import whitelist_for_tests
 from frappe.utils.password import update_password
 
 USER = "upgrade-wiki@example.com"
+READER = "upgrade-wiki-reader@example.com"
 TITLE = "Dinext upgrade smoke"
 
 
@@ -23,28 +24,44 @@ def csrf():
 @whitelist_for_tests
 def cleanup():
 	_require_test_site()
-	for name in frappe.get_all("Wiki Space", filters={"route": "dinext-upgrade-smoke", "owner": USER}, pluck="name"):
+	routes = ("dinext-upgrade-smoke", "dinext-upgrade-restricted")
+	for name in frappe.get_all("Wiki Space", filters={"route": ("in", routes), "owner": USER}, pluck="name"):
 		frappe.delete_doc("Wiki Space", name, force=True, ignore_permissions=True)
-	if frappe.db.exists("User", USER):
-		frappe.delete_doc("User", USER, force=True, ignore_permissions=True)
+	for email in (READER, USER):
+		if frappe.db.exists("User", email):
+			frappe.delete_doc("User", email, force=True, ignore_permissions=True)
+
+
+def _create_user(email, roles=()):
+	password = frappe.generate_hash(length=24)
+	user = frappe.get_doc({
+		"doctype": "User", "email": email, "first_name": "Wiki Upgrade Test",
+		"send_welcome_email": 0, "user_type": "System User", "language": "en",
+	})
+	user.insert(ignore_permissions=True)
+	if roles:
+		user.add_roles(*roles)
+	update_password(email, password)
+	return password
 
 
 @whitelist_for_tests
 def prepare():
 	_require_test_site()
 	cleanup()
-	password = frappe.generate_hash(length=24)
-	user = frappe.get_doc({
-		"doctype": "User", "email": USER, "first_name": "Administrator Upgrade Test",
-		"send_welcome_email": 0, "user_type": "System User", "language": "en",
-	})
-	user.insert(ignore_permissions=True)
-	roles = [r for r in ['System Manager', 'Wiki Manager', 'Wiki User'] if frappe.db.exists("Role", r)]
-	user.add_roles(*roles)
-	update_password(USER, password)
+	roles = [r for r in ("System Manager", "Wiki Manager", "Wiki User") if frappe.db.exists("Role", r)]
+	password = _create_user(USER, roles)
+	reader_password = _create_user(READER)
 	result = {"user": USER, "password": password, "title": TITLE}
 	from wiki.tests.factory import make_space, make_document
 	space = make_space(route="dinext-upgrade-smoke", space_name=TITLE, owner=USER)
 	document = make_document(parent=space.root_group, title=TITLE, content="Upgrade content before edit", owner=USER)
-	result.update({"space": space.name, "document": document.name, "route": document.route})
+	restricted = make_space(
+		route="dinext-upgrade-restricted", space_name="Restricted upgrade space",
+		roles=[("System Manager", "Write")], owner=USER,
+	)
+	result.update({
+		"space": space.name, "document": document.name, "route": document.route,
+		"restricted": restricted.name, "reader": READER, "readerPassword": reader_password,
+	})
 	return result

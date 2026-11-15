@@ -10,7 +10,7 @@ app_license = "MIT"
 add_to_apps_screen = [
 	{
 		"name": "wiki",
-		"logo": "/assets/wiki/images/wiki-logo.png",
+		"logo": "/assets/wiki/images/frappe-wiki-logo.svg",
 		"title": "Wiki",
 		"route": "/wiki-app",
 		"has_permission": "wiki.utils.check_app_permission",
@@ -215,3 +215,7 @@ website_route_rules = [
 ]
 
 after_request = ["wiki.www.wiki_app.set_robots_header"]
+
+# Expose method source code through the API discovery endpoints. Safe for open
+# source apps and helps API clients understand what a method does.
+expose_discovery_source = True
