@@ -83,6 +83,7 @@ frappe_cli --site "$site" clear-cache
 printf 'Tested %s at `%s` after migration from `%s`.\n' "$app" "$revision" "$baseline" | tee "$reports/revision.txt" >> "$GITHUB_STEP_SUMMARY"
 
 if [[ "$phase" == compatibility ]]; then
+  python -m pip install -q unittest-xml-reporting==3.2.0
   yarn --cwd apps/wiki/frontend test
   frappe_cli --site "$site" run-tests --app wiki --module wiki.wiki.test_markdown --junit-xml-output "$reports/test_markdown.xml"
   frappe_cli --site "$site" run-tests --app wiki --module wiki.test_permissions --junit-xml-output "$reports/test_permissions.xml"
