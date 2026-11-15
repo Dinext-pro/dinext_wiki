@@ -33,3 +33,6 @@ wiki/www/og_playground.html
 # Local browser-test output
 cypress/screenshots/
 cypress/videos/
+
+# Local Git worktrees
+/worktrees/
